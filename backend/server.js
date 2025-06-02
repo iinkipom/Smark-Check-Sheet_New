@@ -27,8 +27,11 @@ app.get('/api/data', (req, res) => {
 
   // Convert date fields manually
   const processedData = jsonData.map(row => {
-    if (typeof row.Date === 'number') {
-      row.Date = excelDateToJSDate(row.Date); // Convert
+    if (typeof row['Start time'] === 'number') {
+      row['Start time'] = excelDateToJSDate(row['Start time']); // Convert
+    }
+    if (typeof row['Completion time'] === 'number'){
+        row['Completion time'] = excelDateToJSDate(row['Completion time']);
     }
     return row;
   });
