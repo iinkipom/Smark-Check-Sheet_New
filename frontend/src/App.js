@@ -10,7 +10,7 @@ function App() {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    axios.get('https://smark-check-sheet-new-1.onrender.com')
+    axios.get('https://smark-check-sheet-new-1.onrender.com/api/data')
       .then(res => setData(res.data))
       .catch(err => console.error(err));
   }, []);
