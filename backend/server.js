@@ -3,9 +3,10 @@ const xlsx = require('xlsx');
 const app = express();
 const PORT = 5000;
 
+// Utility function to convert Excel serial dates to JS date
 function excelDateToJSDate(serial) {
   const utc_days = Math.floor(serial - 25569);
-  const utc_value = utc_days * 86400; // seconds
+  const utc_value = utc_days * 86400;
   const date_info = new Date(utc_value * 1000);
 
   const fractional_day = serial - Math.floor(serial);
@@ -18,23 +19,25 @@ function excelDateToJSDate(serial) {
   return date_info.toISOString(); // or use toLocaleString()
 }
 
+// ✅ Load Excel and convert only once when server starts
+const workbook = xlsx.readFile('data.xlsx');
+const sheet = workbook.Sheets[workbook.SheetNames[0]];
+const jsonData = xlsx.utils.sheet_to_json(sheet);
+
+// ✅ Process dates once and save
+const processedData = jsonData.map(row => {
+  if (typeof row['Start time'] === 'number') {
+    row['Start time'] = excelDateToJSDate(row['Start time']);
+  }
+  if (typeof row['Completion time'] === 'number') {
+    row['Completion time'] = excelDateToJSDate(row['Completion time']);
+  }
+  return row;
+});
+
+// ✅ Serve already-loaded data instantly
 app.get('/api/data', (req, res) => {
-  const workbook = xlsx.readFile('Smart Daily Check Sheet Machine_INDOOR 1.xlsx');
-  const sheet = workbook.Sheets[workbook.SheetNames[0]];
-  const jsonData = xlsx.utils.sheet_to_json(sheet);
-
-  const processedData = jsonData.map(row => {
-    if (typeof row['Start time'] === 'number') {
-      row['Start time'] = excelDateToJSDate(row['Start time']);
-    }
-    if (typeof row['Completion time'] === 'number') {
-      row['Completion time'] = excelDateToJSDate(row['Completion time']);
-    }
-    return row;
-  });
-
   res.json(processedData);
 });
 
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
-
