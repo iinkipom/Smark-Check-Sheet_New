@@ -15,7 +15,22 @@ function TableView({ data }) {
         <tbody>
           {data.map((row, i) => (
             <tr key={i}>
-              {headers.map(header => <td key={header}>{row[header]}</td>)}
+              {headers.map(header => {
+                let cellValue = row[header];
+
+                // Format Start time and Completion time as readable date-time
+                if (header === 'Start time' || header === 'Completion time') {
+                  if (cellValue) {
+                    const date = new Date(cellValue);
+                    // Check for valid date
+                    if (!isNaN(date)) {
+                      cellValue = date.toLocaleString();
+                    }
+                  }
+                }
+
+                return <td key={header}>{cellValue}</td>;
+              })}
             </tr>
           ))}
         </tbody>
