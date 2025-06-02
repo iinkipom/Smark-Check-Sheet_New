@@ -4,11 +4,13 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import TableView from './TableView';
 import GraphView from './GraphView';
 
+
+
 function App() {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/data')
+    axios.get('https://smark-check-sheet-new-1.onrender.com')
       .then(res => setData(res.data))
       .catch(err => console.error(err));
   }, []);
@@ -21,5 +23,6 @@ function App() {
     </div>
   );
 }
+
 
 export default App;
