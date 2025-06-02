@@ -20,7 +20,7 @@ function excelDateToJSDate(serial) {
 }
 
 // ✅ Load Excel and convert only once when server starts
-const workbook = xlsx.readFile('data.xlsx');
+const workbook = xlsx.readFile('Smart Daily Check Sheet Machine_INDOOR 1.xlsx');
 const sheet = workbook.Sheets[workbook.SheetNames[0]];
 const jsonData = xlsx.utils.sheet_to_json(sheet);
 
