@@ -3,13 +3,11 @@ const xlsx = require('xlsx');
 const app = express();
 const PORT = 5000;
 
-// Helper: Convert Excel serial date to JS date string
 function excelDateToJSDate(serial) {
   const utc_days = Math.floor(serial - 25569);
   const utc_value = utc_days * 86400; // seconds
   const date_info = new Date(utc_value * 1000);
 
-  // Add fractional day (time)
   const fractional_day = serial - Math.floor(serial);
   const total_seconds = Math.floor(86400 * fractional_day);
   const hours = Math.floor(total_seconds / 3600);
@@ -17,7 +15,7 @@ function excelDateToJSDate(serial) {
   const seconds = total_seconds % 60;
 
   date_info.setHours(hours, minutes, seconds);
-  return date_info.toISOString(); // Or use toLocaleString()
+  return date_info.toISOString(); // or use toLocaleString()
 }
 
 app.get('/api/data', (req, res) => {
@@ -25,13 +23,12 @@ app.get('/api/data', (req, res) => {
   const sheet = workbook.Sheets[workbook.SheetNames[0]];
   const jsonData = xlsx.utils.sheet_to_json(sheet);
 
-  // Convert date fields manually
   const processedData = jsonData.map(row => {
     if (typeof row['Start time'] === 'number') {
-      row['Start time'] = excelDateToJSDate(row['Start time']); // Convert
+      row['Start time'] = excelDateToJSDate(row['Start time']);
     }
-    if (typeof row['Completion time'] === 'number'){
-        row['Completion time'] = excelDateToJSDate(row['Completion time']);
+    if (typeof row['Completion time'] === 'number') {
+      row['Completion time'] = excelDateToJSDate(row['Completion time']);
     }
     return row;
   });
@@ -40,3 +37,4 @@ app.get('/api/data', (req, res) => {
 });
 
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+
