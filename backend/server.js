@@ -1,19 +1,17 @@
-const express = require('express');
-const xlsx = require('xlsx');
+const express = require('express') ;
+const cors = require('cors');
+const XLSX = require('xlsx');
 const app = express();
+const PORT = 5000;
 
-app.get('/data', (req, res) => {
-  try {
-    // Read the Excel file on the server
-    const workbook = xlsx.readFile('Smart Daily Check Sheet Machine_INDOOR 1.xlsx');              // Path to Excel file
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];   // First sheet
-    // Convert sheet data to JSON (array of objects)
-    const jsonData = xlsx.utils.sheet_to_json(sheet);
-    res.json(jsonData);  // Send JSON to frontend
-  } catch(err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to read Excel file' });
-  }
+app.use(cors());
+
+app.get('/api/data', (req, res) => {
+    const workbook = XLSX.readFile('Smart Daily Check Sheet Machine_INDOOR 1.xlsx');
+    const sheetName = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+    const data = XLSX.utils.sheet_to_json(sheet);
+    res.json(data);
 });
 
-app.listen(3000, () => console.log('Server running on port 3000'));
+app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
