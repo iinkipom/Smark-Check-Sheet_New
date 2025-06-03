@@ -3,9 +3,12 @@ import React from 'react';
 function TableView({ data }) {
   if (!data.length) return <p>Loading table...</p>;
 
-  const headers = Object.keys(data[0]);
+  // Get all unique headers from all rows
+  const headers = Array.from(
+    new Set(data.flatMap(row => Object.keys(row)))
+  );
 
-  // Utility to convert Excel serial date to JS date string
+  // Excel serial to JS date-time string
   const convertExcelDate = (serial) => {
     const utc_days = Math.floor(serial - 25569);
     const utc_value = utc_days * 86400;
@@ -24,27 +27,29 @@ function TableView({ data }) {
   return (
     <div className="mb-4">
       <h4>Data Table</h4>
-      <table className="table table-bordered table-striped">
-        <thead>
-          <tr>{headers.map(header => <th key={header}>{header}</th>)}</tr>
-        </thead>
-        <tbody>
-          {data.map((row, i) => (
-            <tr key={i}>
-              {headers.map(header => {
-                let value = row[header];
-                if (
-                  (header === 'Start time' || header === 'Completion time') &&
-                  typeof value === 'number'
-                ) {
-                  value = convertExcelDate(value);
-                }
-                return <td key={header}>{value}</td>;
-              })}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div style={{ overflowX: 'auto', maxWidth: '100%' }}>
+        <table className="table table-bordered table-striped table-sm">
+          <thead>
+            <tr>{headers.map(header => <th key={header}>{header}</th>)}</tr>
+          </thead>
+          <tbody>
+            {data.map((row, i) => (
+              <tr key={i}>
+                {headers.map(header => {
+                  let value = row[header] ?? ''; // Use empty string if field doesn't exist
+                  if (
+                    (header === 'Start time' || header === 'Completion time') &&
+                    typeof value === 'number'
+                  ) {
+                    value = convertExcelDate(value);
+                  }
+                  return <td key={header}>{value}</td>;
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
