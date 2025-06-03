@@ -5,6 +5,22 @@ function TableView({ data }) {
 
   const headers = Object.keys(data[0]);
 
+  // Utility to convert Excel serial date to JS date string
+  const convertExcelDate = (serial) => {
+    const utc_days = Math.floor(serial - 25569);
+    const utc_value = utc_days * 86400;
+    const date_info = new Date(utc_value * 1000);
+
+    const fractional_day = serial - Math.floor(serial);
+    const total_seconds = Math.floor(86400 * fractional_day);
+    const hours = Math.floor(total_seconds / 3600);
+    const minutes = Math.floor((total_seconds % 3600) / 60);
+    const seconds = total_seconds % 60;
+
+    date_info.setHours(hours, minutes, seconds);
+    return date_info.toLocaleString();
+  };
+
   return (
     <div className="mb-4">
       <h4>Data Table</h4>
@@ -15,7 +31,16 @@ function TableView({ data }) {
         <tbody>
           {data.map((row, i) => (
             <tr key={i}>
-              {headers.map(header => <td key={header}>{row[header]}</td>)}
+              {headers.map(header => {
+                let value = row[header];
+                if (
+                  (header === 'Start time' || header === 'Completion time') &&
+                  typeof value === 'number'
+                ) {
+                  value = convertExcelDate(value);
+                }
+                return <td key={header}>{value}</td>;
+              })}
             </tr>
           ))}
         </tbody>
